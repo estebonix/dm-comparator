@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparador de DMs (IA)</title>
+    <style>
+        :root { --bg-dark: #1a1a1a; --text-light: #e0e0e0; --accent: #6200ea; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-dark); color: var(--text-light); margin: 0; padding: 20px; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; }
+        
+        /* Layout */
+        #setup-screen { max-width: 600px; margin: auto; text-align: center; }
+        #game-screen { display: none; flex-direction: column; height: 100%; }
+        
+        .arena { display: flex; flex: 1; gap: 20px; overflow: hidden; margin-bottom: 20px; }
+        .column { flex: 1; background: #2d2d2d; border-radius: 8px; display: flex; flex-direction: column; border: 1px solid #444; }
+        .column h2 { text-align: center; background: #333; margin: 0; padding: 10px; border-bottom: 1px solid #444; }
+        
+        .log-container { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 10px; border-radius: 5px; max-width: 85%; line-height: 1.4; }
+        .msg.user { align-self: flex-end; background-color: #2e7d32; color: white; }
+        .msg.ai { align-self: flex-start; background-color: #424242; border-left: 3px solid var(--accent); }
+
+        /* Controles */
+        .input-area { display: flex; gap: 10px; padding: 10px; background: #252525; border-radius: 8px; }
+        input, textarea { width: 100%; padding: 10px; border-radius: 5px; border: none; background: #333; color: white; }
+        button { padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:disabled { background: #555; cursor: wait; }
+        
+        .loader { text-align: center; color: #888; font-style: italic; display: none;}
+    </style>
+</head>
+<body>
+
+    <!-- RF1: Pantalla de Configuración -->
+    <div id="setup-screen">
+        <h1>⚔️ Comparador de DMs IA</h1>
+        <p>Configura el escenario inicial para ambos Dungeon Masters.</p>
+        <textarea id="system-prompt" rows="6">Eres un Dungeon Master de D&D sombrío y realista. La aventura comienza en las ruinas de Neverwinter. El jugador es un Pícaro llamado 'Sombra'. Describe el entorno y espera acción.</textarea>
+        <br><br>
+        <button onclick="startGame()">INICIAR AVENTURA</button>
+    </div>
+
+    <!-- RF2: Pantalla de Juego -->
+    <div id="game-screen">
+        <div class="arena">
+            <div class="column">
+                <h2>🤖 Google Gemma 2 (via Groq)</h2>
+                <div class="log-container" id="log-1"></div>
+            </div>
+            <div class="column">
+                <h2>⚡ Meta Llama 3.3 (via Groq)</h2>
+                <div class="log-container" id="log-2"></div>
+            </div>
+        </div>
+
+        <div class="loader" id="loader">Los DMs están pensando... 🎲</div>
+
+        <!-- RF3: Acción Única -->
+        <div class="input-area">
+            <input type="text" id="user-action" placeholder="¿Qué quieres hacer? (Ej: Investigo el cofre...)" onkeypress="handleEnter(event)">
+            <button onclick="sendTurn()" id="btn-send">ENVIAR ACCIÓN</button>
+        </div>
+    </div>
+
+    <script>
+        let currentGameId = null;
+
+        // RT2: Javascript Asíncrono
+        async function startGame() {
+            const prompt = document.getElementById('system-prompt').value;
+            
+            try {
+                const res = await fetch('/api/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ systemPrompt: prompt })
+                });
+                const data = await res.json();
+                
+                if (data.gameId) {
+                    currentGameId = data.gameId;
+                    document.getElementById('setup-screen').style.display = 'none';
+                    document.getElementById('game-screen').style.display = 'flex';
+                    
+                    // Añadir mensaje inicial visual
+                    addMessageToLog(1, 'ai', "Esperando tu primera acción para comenzar la historia basada en el prompt...");
+                    addMessageToLog(2, 'ai', "Esperando tu primera acción para comenzar la historia basada en el prompt...");
+                }
+            } catch (err) {
+                alert("Error conectando con el servidor");
+            }
+        }
+
+        async function sendTurn() {
+            const input = document.getElementById('user-action');
+            const action = input.value.trim();
+            if (!action) return;
+
+            // UI Updates
+            input.value = '';
+            document.getElementById('btn-send').disabled = true;
+            document.getElementById('loader').style.display = 'block';
+
+            // Mostrar acción del usuario en ambas columnas
+            addMessageToLog(1, 'user', action);
+            addMessageToLog(2, 'user', action);
+
+            try {
+                // RF4 & RT6: Enviar al backend
+                const res = await fetch('/api/turn', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ gameId: currentGameId, userAction: action })
+                });
+                
+                const data = await res.json();
+
+                // Mostrar respuestas
+                addMessageToLog(1, 'ai', data.dm1 || "Error recibiendo respuesta");
+                addMessageToLog(2, 'ai', data.dm2 || "Error recibiendo respuesta");
+
+            } catch (err) {
+                console.error(err);
+                alert("Error en el turno. Revisa la consola.");
+            } finally {
+                document.getElementById('btn-send').disabled = false;
+                document.getElementById('loader').style.display = 'none';
+                input.focus();
+            }
+        }
+
+        function addMessageToLog(dmNumber, role, text) {
+            const container = document.getElementById(`log-${dmNumber}`);
+            const div = document.createElement('div');
+            div.className = `msg ${role}`;
+            // Renderizado simple de saltos de línea
+            div.innerText = text; 
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') sendTurn();
+        }
+    </script>
+</body>
+</html>

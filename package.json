@@ -1,0 +1,18 @@
+{
+    "name": "dm-comparator-ia",
+    "version": "1.0.0",
+    "description": "Comparador de DMs con IA para 2DAW",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "dev": "node --watch server.js"
+    },
+    "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^16.3.1",
+        "express": "^4.18.2",
+        "@google/generative-ai": "^0.21.0",
+        "openai": "^4.20.1",
+        "sqlite3": "^5.1.6"
+    }
+}

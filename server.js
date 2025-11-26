@@ -36,7 +36,6 @@ db.serialize(() => {
 });
 
 // --- CONFIGURACIÓN API (SOLO GROQ) ---
-// Usamos Groq para acceder tanto a modelos de Google como de Meta
 const groqClient = new OpenAI({
     apiKey: process.env.GROQ_API_KEY,
     baseURL: "https://api.groq.com/openai/v1" 
@@ -44,14 +43,45 @@ const groqClient = new OpenAI({
 
 // --- RUTAS ---
 
-app.post('/api/start', (req, res) => {
+// 1. Iniciar Partida Y Generar Intro (MODIFICADO)
+app.post('/api/start', async (req, res) => {
     const { systemPrompt } = req.body;
-    const stmt = db.prepare("INSERT INTO games (system_prompt) VALUES (?)");
-    stmt.run(systemPrompt, function(err) {
+    
+    // 1. Crear la partida en BD
+    db.run("INSERT INTO games (system_prompt) VALUES (?)", [systemPrompt], async function(err) {
         if (err) return res.status(500).json({ error: err.message });
-        res.json({ gameId: this.lastID, message: "Partida iniciada" });
+        
+        const gameId = this.lastID;
+        const introTrigger = "Describe la escena inicial detalladamente para comenzar la aventura.";
+
+        try {
+            // 2. Pedir a las IAs la introducción inmediatamente
+            // Nota: Pasamos un historial vacío porque es el inicio
+            const results = await Promise.allSettled([
+                callLlamaFastViaGroq(systemPrompt, [], introTrigger),
+                callLlamaSmartViaGroq(systemPrompt, [], introTrigger)
+            ]);
+
+            const intro1 = results[0].status === 'fulfilled' ? results[0].value : "Error generando intro 1.";
+            const intro2 = results[1].status === 'fulfilled' ? results[1].value : "Error generando intro 2.";
+
+            // 3. Guardar estas introducciones en la BD como mensajes del modelo
+            await saveMessage(gameId, 1, 'model', intro1);
+            await saveMessage(gameId, 2, 'model', intro2);
+
+            // 4. Devolver todo al frontend
+            res.json({ 
+                gameId: gameId, 
+                message: "Partida iniciada",
+                dm1: intro1,
+                dm2: intro2
+            });
+
+        } catch (error) {
+            console.error("Error en intro:", error);
+            res.status(500).json({ error: "Error generando introducción" });
+        }
     });
-    stmt.finalize();
 });
 
 app.post('/api/turn', async (req, res) => {
@@ -74,18 +104,15 @@ app.post('/api/turn', async (req, res) => {
         const history1 = await getHistory(gameId, 1);
         const history2 = await getHistory(gameId, 2);
 
-        // Llamada a APIs en Paralelo (Ambas a Groq, pero distintos modelos)
+        // Llamada a APIs en Paralelo
         const results = await Promise.allSettled([
-            callGoogleViaGroq(game.system_prompt, history1, userAction),
-            callMetaViaGroq(game.system_prompt, history2, userAction)
+            callLlamaFastViaGroq(game.system_prompt, history1, userAction),
+            callLlamaSmartViaGroq(game.system_prompt, history2, userAction)
         ]);
 
         // Extraer resultados
-        const response1 = results[0].status === 'fulfilled' ? results[0].value : "Error Google/Gemma: " + results[0].reason;
-        const response2 = results[1].status === 'fulfilled' ? results[1].value : "Error Meta/Llama: " + results[1].reason;
-
-        if (results[0].status === 'rejected') console.error("FALLO MODELO 1:", results[0].reason);
-        if (results[1].status === 'rejected') console.error("FALLO MODELO 2:", results[1].reason);
+        const response1 = results[0].status === 'fulfilled' ? results[0].value : "Error Llama Fast: " + results[0].reason;
+        const response2 = results[1].status === 'fulfilled' ? results[1].value : "Error Llama Smart: " + results[1].reason;
 
         // Guardar respuestas
         await saveMessage(gameId, 1, 'model', response1);
@@ -128,29 +155,38 @@ function getHistory(gameId, dmId) {
     });
 }
 
-// --- LÓGICA IAs (Unificadas en Groq) ---
+// --- LÓGICA IAs ---
 
-async function callGoogleViaGroq(system, history, currentInput) {
+async function callLlamaFastViaGroq(system, history, currentInput) {
     const messages = [{ role: "system", content: system }];
-    history.forEach(msg => messages.push({ role: msg.role, content: msg.content }));
+    
+    // Mapear 'model' a 'assistant'
+    history.forEach(msg => {
+        const role = msg.role === 'model' ? 'assistant' : msg.role;
+        messages.push({ role: role, content: msg.content });
+    });
+    
     messages.push({ role: "user", content: currentInput });
 
     const completion = await groqClient.chat.completions.create({
         messages: messages,
-        // MODELO DE GOOGLE (Gemma 2) corriendo en Groq
-        model: "gemma2-9b-it", 
+        model: "llama-3.1-8b-instant", 
     });
     return completion.choices[0].message.content;
 }
 
-async function callMetaViaGroq(system, history, currentInput) {
+async function callLlamaSmartViaGroq(system, history, currentInput) {
     const messages = [{ role: "system", content: system }];
-    history.forEach(msg => messages.push({ role: msg.role, content: msg.content }));
+    
+    history.forEach(msg => {
+        const role = msg.role === 'model' ? 'assistant' : msg.role;
+        messages.push({ role: role, content: msg.content });
+    });
+
     messages.push({ role: "user", content: currentInput });
 
     const completion = await groqClient.chat.completions.create({
         messages: messages,
-        // MODELO DE META (Llama 3.3) corriendo en Groq
         model: "llama-3.3-70b-versatile", 
     });
     return completion.choices[0].message.content;

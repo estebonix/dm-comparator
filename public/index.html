@@ -4,119 +4,334 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comparador de DMs (IA)</title>
-    <style>
-        :root { --bg-dark: #1a1a1a; --text-light: #e0e0e0; --accent: #6200ea; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-dark); color: var(--text-light); margin: 0; padding: 20px; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; }
-        
-        /* Layout */
-        #setup-screen { max-width: 600px; margin: auto; text-align: center; }
-        #game-screen { display: none; flex-direction: column; height: 100%; }
-        
-        .arena { display: flex; flex: 1; gap: 20px; overflow: hidden; margin-bottom: 20px; }
-        .column { flex: 1; background: #2d2d2d; border-radius: 8px; display: flex; flex-direction: column; border: 1px solid #444; }
-        .column h2 { text-align: center; background: #333; margin: 0; padding: 10px; border-bottom: 1px solid #444; }
-        
-        .log-container { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .msg { padding: 10px; border-radius: 5px; max-width: 85%; line-height: 1.4; }
-        .msg.user { align-self: flex-end; background-color: #2e7d32; color: white; }
-        .msg.ai { align-self: flex-start; background-color: #424242; border-left: 3px solid var(--accent); }
-
-        /* Controles */
-        .input-area { display: flex; gap: 10px; padding: 10px; background: #252525; border-radius: 8px; }
-        input, textarea { width: 100%; padding: 10px; border-radius: 5px; border: none; background: #333; color: white; }
-        button { padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        button:disabled { background: #555; cursor: wait; }
-        
-        .loader { text-align: center; color: #888; font-style: italic; display: none;}
-    </style>
+    <!-- Importamos una fuente bonita de Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Vinculamos el archivo CSS externo -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- RF1: Pantalla de Configuración -->
+    <!-- CREADOR DE PERSONAJE -->
     <div id="setup-screen">
-        <h1>⚔️ Comparador de DMs IA</h1>
-        <p>Configura el escenario inicial para ambos Dungeon Masters.</p>
-        <textarea id="system-prompt" rows="6">Eres un Dungeon Master de D&D sombrío y realista. La aventura comienza en las ruinas de Neverwinter. El jugador es un Pícaro llamado 'Sombra'. Describe el entorno y espera acción.</textarea>
-        <br><br>
-        <button onclick="startGame()">INICIAR AVENTURA</button>
+        <div>
+            <h1>🧙‍♂️ Creador de Héroe</h1>
+            <p class="subtitle">Diseña tu personaje y deja que las IAs narren tu destino.</p>
+        </div>
+
+        <div class="char-form">
+            <div class="form-group full-width">
+                <label>Nombre del Héroe</label>
+                <input type="text" id="char-name" class="setup-input" placeholder="Ej: Arin Bjornsson">
+            </div>
+
+            <div class="form-group">
+                <label>Raza</label>
+                <select id="char-race" class="setup-select">
+                    <option value="Humano">Humano</option>
+                    <option value="Elfo">Elfo</option>
+                    <option value="Enano">Enano</option>
+                    <option value="Mediano">Mediano</option>
+                    <option value="Orco">Orco</option>
+                    <option value="Tiefling">Tiefling</option>
+                    <option value="Dracónido">Dracónido</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Clase</label>
+                <select id="char-class" class="setup-select">
+                    <option value="Guerrero">Guerrero</option>
+                    <option value="Mago">Mago</option>
+                    <option value="Pícaro">Pícaro</option>
+                    <option value="Clérigo">Clérigo</option>
+                    <option value="Explorador">Explorador</option>
+                    <option value="Paladín">Paladín</option>
+                    <option value="Bardo">Bardo</option>
+                    <option value="Bárbaro">Bárbaro</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Alineamiento</label>
+                <select id="char-align" class="setup-select">
+                    <option value="Legal Bueno">Legal Bueno</option>
+                    <option value="Neutral Bueno">Neutral Bueno</option>
+                    <option value="Caótico Bueno">Caótico Bueno</option>
+                    <option value="Legal Neutral">Legal Neutral</option>
+                    <option value="Neutral Auténtico">Neutral Auténtico</option>
+                    <option value="Caótico Neutral">Caótico Neutral</option>
+                    <option value="Legal Malvado">Legal Malvado</option>
+                    <option value="Neutral Malvado">Neutral Malvado</option>
+                    <option value="Caótico Malvado">Caótico Malvado</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Trasfondo</label>
+                <select id="char-bg" class="setup-select">
+                    <option value="Soldado">Soldado</option>
+                    <option value="Criminal">Criminal</option>
+                    <option value="Erudito">Erudito</option>
+                    <option value="Noble">Noble</option>
+                    <option value="Héroe del Pueblo">Héroe del Pueblo</option>
+                    <option value="Acolito">Acólito</option>
+                    <option value="Ermitaño">Ermitaño</option>
+                </select>
+            </div>
+        </div>
+        
+        <button onclick="startGame()" class="main-btn">COMENZAR AVENTURA</button>
     </div>
 
-    <!-- RF2: Pantalla de Juego -->
+    <!-- PANTALLA DE JUEGO -->
     <div id="game-screen">
         <div class="arena">
             <div class="column">
-                <h2>🤖 Google Gemma 2 (via Groq)</h2>
+                <h2>Llama 3.1 8B (Rápido)</h2>
                 <div class="log-container" id="log-1"></div>
             </div>
             <div class="column">
-                <h2>⚡ Meta Llama 3.3 (via Groq)</h2>
+                <h2>Llama 3.3 70B (Inteligente)</h2>
                 <div class="log-container" id="log-2"></div>
             </div>
         </div>
 
-        <div class="loader" id="loader">Los DMs están pensando... 🎲</div>
+        <div class="loader" id="loader">✨ Los DMs están tejiendo el destino...</div>
 
-        <!-- RF3: Acción Única -->
+        <!-- Panel de control -->
         <div class="input-area">
-            <input type="text" id="user-action" placeholder="¿Qué quieres hacer? (Ej: Investigo el cofre...)" onkeypress="handleEnter(event)">
-            <button onclick="sendTurn()" id="btn-send">ENVIAR ACCIÓN</button>
+            
+            <!-- INPUT OCULTO PARA ALMACENAR EL VALOR SELECCIONADO -->
+            <input type="hidden" id="dice-select" value="none">
+
+            <!-- DROPDOWN PERSONALIZADO -->
+            <div class="custom-dropdown" id="dice-dropdown">
+                <div class="dropdown-btn" onclick="toggleDiceMenu()">
+                    <div class="selected-value" id="selected-dice-display">
+                        <span>🚫</span> <span>Sin dado</span>
+                    </div>
+                    <span class="arrow-icon">▼</span>
+                </div>
+                
+                <div class="dropdown-content" id="dice-options">
+                    <div class="dropdown-item" onclick="selectDice('none', '🚫', 'Sin dado')">
+                        <span>🚫</span> Sin dado
+                    </div>
+                    <div class="dropdown-item" onclick="selectDice('20', getDiceSvg('d20'), 'd20 (Acierto)')">
+                        <!-- SVG d20 -->
+                        <svg class="dice-svg" viewBox="0 0 24 24"><path d="M12 2L2 8l10 6 10-6-10-6zm0 2.2l6.5 3.9-6.5 3.9-6.5-3.9L12 4.2zM2.2 9.5l9.3 5.5v9l-9.3-5.5v-9zm19.6 0v9l-9.3 5.5v-9l9.3-5.5z"/></svg>
+                        d20 (Acierto)
+                    </div>
+                    <div class="dropdown-item" onclick="selectDice('12', getDiceSvg('d12'), 'd12 (Daño)')">
+                        <!-- SVG d12 -->
+                        <svg class="dice-svg" viewBox="0 0 24 24"><path d="M12 2l8.5 6-3.3 9.9H6.8L3.5 8 12 2zm0 2.5L5.8 8l2.2 6.5h8L18.2 8 12 4.5z"/></svg>
+                        d12 (Daño)
+                    </div>
+                    <div class="dropdown-item" onclick="selectDice('10', getDiceSvg('d10'), 'd10 (Daño)')">
+                        <!-- SVG d10 -->
+                        <svg class="dice-svg" viewBox="0 0 24 24"><path d="M12 2L4 12l8 10 8-10-8-10zm0 2.5l5.5 8.7L12 19.3 6.5 13.2 12 4.5z"/></svg>
+                        d10 (Daño)
+                    </div>
+                    <div class="dropdown-item" onclick="selectDice('8', getDiceSvg('d8'), 'd8 (Daño)')">
+                        <!-- SVG d8 -->
+                        <svg class="dice-svg" viewBox="0 0 24 24"><path d="M12 2L2 12l10 10 10-10L12 2zm0 2.8L19.2 12 12 19.2 4.8 12 12 4.8z"/></svg>
+                        d8 (Daño)
+                    </div>
+                    <div class="dropdown-item" onclick="selectDice('6', getDiceSvg('d6'), 'd6 (Corto)')">
+                        <!-- SVG d6 -->
+                        <svg class="dice-svg" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" ry="2" stroke-width="2"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="16" cy="8" r="1.5" fill="currentColor"/><circle cx="8" cy="16" r="1.5" fill="currentColor"/></svg>
+                        d6 (Corto)
+                    </div>
+                    <div class="dropdown-item" onclick="selectDice('4', getDiceSvg('d4'), 'd4 (Poción)')">
+                        <!-- SVG d4 -->
+                        <svg class="dice-svg" viewBox="0 0 24 24"><path d="M12 2L3 20h18L12 2zm0 3.5l6.5 13h-13l6.5-13z"/></svg>
+                        d4 (Poción)
+                    </div>
+                    <div class="dropdown-item" onclick="selectDice('100', '💯', 'd100 (%)')">
+                        <span>💯</span> d100 (%)
+                    </div>
+                </div>
+            </div>
+            
+            <input type="text" id="user-action" placeholder="Describe tu acción heroica..." onkeypress="handleEnter(event)" autocomplete="off">
+            <button onclick="sendTurn()" id="btn-send" class="main-btn">ENVIAR</button>
         </div>
     </div>
 
     <script>
         let currentGameId = null;
 
-        // RT2: Javascript Asíncrono
-        async function startGame() {
-            const prompt = document.getElementById('system-prompt').value;
+        // --- Funciones del Dropdown Personalizado ---
+        
+        function toggleDiceMenu() {
+            const dropdown = document.getElementById('dice-dropdown');
+            const content = document.getElementById('dice-options');
+            content.classList.toggle('show');
+            dropdown.classList.toggle('active');
+        }
+
+        // Cierra el dropdown si clicas fuera
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropdown-btn') && !event.target.matches('.dropdown-btn *')) {
+                const contents = document.getElementsByClassName("dropdown-content");
+                for (let i = 0; i < contents.length; i++) {
+                    const openDropdown = contents[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                        document.getElementById('dice-dropdown').classList.remove('active');
+                    }
+                }
+            }
+        }
+
+        function getDiceSvg(type) {
+            // Helper para devolver el HTML del SVG según el tipo, para pintar el seleccionado
+            // Copiamos los paths definidos en el HTML arriba
+            const paths = {
+                'd20': 'M12 2L2 8l10 6 10-6-10-6zm0 2.2l6.5 3.9-6.5 3.9-6.5-3.9L12 4.2zM2.2 9.5l9.3 5.5v9l-9.3-5.5v-9zm19.6 0v9l-9.3 5.5v-9l9.3-5.5z',
+                'd12': 'M12 2l8.5 6-3.3 9.9H6.8L3.5 8 12 2zm0 2.5L5.8 8l2.2 6.5h8L18.2 8 12 4.5z',
+                'd10': 'M12 2L4 12l8 10 8-10-8-10zm0 2.5l5.5 8.7L12 19.3 6.5 13.2 12 4.5z',
+                'd8': 'M12 2L2 12l10 10 10-10L12 2zm0 2.8L19.2 12 12 19.2 4.8 12 12 4.8z',
+                'd4': 'M12 2L3 20h18L12 2zm0 3.5l6.5 13h-13l6.5-13z',
+                'd6': '<rect x="4" y="4" width="16" height="16" rx="2" ry="2" stroke-width="2"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="16" cy="8" r="1.5" fill="currentColor"/><circle cx="8" cy="16" r="1.5" fill="currentColor"/>'
+            };
             
+            if (type === 'd6') return `<svg class="dice-svg" viewBox="0 0 24 24">${paths.d6}</svg>`;
+            if (paths[type]) return `<svg class="dice-svg" viewBox="0 0 24 24"><path d="${paths[type]}"/></svg>`;
+            return '🎲';
+        }
+
+        function selectDice(value, iconHtml, text) {
+            // 1. Actualizar valor oculto (lógica original)
+            document.getElementById('dice-select').value = value;
+            
+            // 2. Actualizar visualización
+            const display = document.getElementById('selected-dice-display');
+            
+            // Si es un SVG string (como el de getDiceSvg o el HTML literal), lo ponemos tal cual
+            // Si es un emoji simple, lo ponemos en span
+            if (iconHtml.includes('<svg') || iconHtml.includes('🚫') || iconHtml.includes('💯')) {
+                 display.innerHTML = `<span>${iconHtml}</span> <span>${text}</span>`;
+            } else {
+                 display.innerHTML = `<span>${iconHtml}</span> <span>${text}</span>`;
+            }
+
+            // 3. Cerrar menú
+            toggleDiceMenu();
+        }
+
+        async function startGame() {
+            // Recoger datos del formulario
+            const name = document.getElementById('char-name').value.trim() || "Aventurero Desconocido";
+            const race = document.getElementById('char-race').value;
+            const charClass = document.getElementById('char-class').value;
+            const align = document.getElementById('char-align').value;
+            const bg = document.getElementById('char-bg').value;
+
+            // CONSTRUCCIÓN DEL PROMPT ELABORADO
+            const elaboratePrompt = `
+Eres un Dungeon Master experto de Dungeons & Dragons 5e. Tu trabajo es narrar una aventura inmersiva, oscura y emocionante.
+
+DETALLES DEL JUGADOR:
+- Nombre: ${name}
+- Raza: ${race}
+- Clase: ${charClass}
+- Alineamiento: ${align}
+- Trasfondo: ${bg}
+
+REGLAS DE DIRECCIÓN:
+1. Actúa como el DM: describe el entorno, los NPCs y las consecuencias. NUNCA decidas las acciones ni los diálogos del jugador.
+2. Sé descriptivo: usa los sentidos (olores, sonidos, atmósfera).
+3. Mecánicas: Si el jugador hace una tirada de dados (ej: [🎲 Tirada d20: 15]), interpreta el resultado. Si es bajo, falla con consecuencias; si es alto, ten éxito.
+4. Contexto Inicial: Comienza la aventura en una situación interesante relacionada con su trasfondo de ${bg}.
+            `.trim();
+
+            // UI Updates
+            const btn = document.querySelector('#setup-screen button');
+            btn.innerText = "Invocando IAs...";
+            btn.disabled = true;
+
             try {
                 const res = await fetch('/api/start', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ systemPrompt: prompt })
+                    body: JSON.stringify({ systemPrompt: elaboratePrompt })
                 });
                 const data = await res.json();
                 
                 if (data.gameId) {
                     currentGameId = data.gameId;
-                    document.getElementById('setup-screen').style.display = 'none';
-                    document.getElementById('game-screen').style.display = 'flex';
                     
-                    // Añadir mensaje inicial visual
-                    addMessageToLog(1, 'ai', "Esperando tu primera acción para comenzar la historia basada en el prompt...");
-                    addMessageToLog(2, 'ai', "Esperando tu primera acción para comenzar la historia basada en el prompt...");
+                    const setup = document.getElementById('setup-screen');
+                    setup.style.opacity = '0';
+                    setTimeout(() => {
+                        setup.style.display = 'none';
+                        const game = document.getElementById('game-screen');
+                        game.style.display = 'flex';
+                        game.style.animation = 'fadeIn 0.5s ease-out';
+                        
+                        if (data.dm1) addMessageToLog(1, 'ai', data.dm1);
+                        if (data.dm2) addMessageToLog(2, 'ai', data.dm2);
+                        
+                    }, 300);
                 }
             } catch (err) {
                 alert("Error conectando con el servidor");
+                btn.innerText = "COMENZAR AVENTURA";
+                btn.disabled = false;
             }
         }
 
         async function sendTurn() {
             const input = document.getElementById('user-action');
-            const action = input.value.trim();
-            if (!action) return;
+            // Usamos el input oculto ahora
+            const dieValue = document.getElementById('dice-select').value;
+            
+            let actionText = input.value.trim();
 
-            // UI Updates
+            if (!actionText && dieValue === 'none') return;
+
+            let displayAction = actionText; 
+
+            if (dieValue !== 'none') {
+                const sides = parseInt(dieValue);
+                const roll = Math.floor(Math.random() * sides) + 1;
+                // Usamos colores para el dado según si es crítico o pifia visualmente
+                let colorClass = '#a78bfa';
+                if(sides === 20 && roll === 20) colorClass = '#10b981'; // Verde crítico
+                if(sides === 20 && roll === 1) colorClass = '#ef4444';  // Rojo pifia
+
+                const diceTag = `[🎲 Tirada d${sides}: <strong style="color:${colorClass}">${roll}</strong>]`;
+                
+                if (displayAction) {
+                    displayAction += " " + diceTag;
+                } else {
+                    displayAction = diceTag;
+                }
+            }
+
             input.value = '';
-            document.getElementById('btn-send').disabled = true;
+            const btn = document.getElementById('btn-send');
+            btn.disabled = true;
             document.getElementById('loader').style.display = 'block';
 
-            // Mostrar acción del usuario en ambas columnas
-            addMessageToLog(1, 'user', action);
-            addMessageToLog(2, 'user', action);
+            addMessageToLog(1, 'user', displayAction, true);
+            addMessageToLog(2, 'user', displayAction, true);
+
+            // Reseteamos el selector de dados VISUAL y el valor oculto
+            if (dieValue !== 'none') {
+               selectDice('none', '🚫', 'Sin dado');
+            }
 
             try {
-                // RF4 & RT6: Enviar al backend
                 const res = await fetch('/api/turn', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ gameId: currentGameId, userAction: action })
+                    body: JSON.stringify({ gameId: currentGameId, userAction: displayAction })
                 });
                 
                 const data = await res.json();
 
-                // Mostrar respuestas
                 addMessageToLog(1, 'ai', data.dm1 || "Error recibiendo respuesta");
                 addMessageToLog(2, 'ai', data.dm2 || "Error recibiendo respuesta");
 
@@ -124,18 +339,23 @@
                 console.error(err);
                 alert("Error en el turno. Revisa la consola.");
             } finally {
-                document.getElementById('btn-send').disabled = false;
+                btn.disabled = false;
                 document.getElementById('loader').style.display = 'none';
                 input.focus();
             }
         }
 
-        function addMessageToLog(dmNumber, role, text) {
+        function addMessageToLog(dmNumber, role, text, isHtml = false) {
             const container = document.getElementById(`log-${dmNumber}`);
             const div = document.createElement('div');
             div.className = `msg ${role}`;
-            // Renderizado simple de saltos de línea
-            div.innerText = text; 
+            
+            if (isHtml) {
+                div.innerHTML = text;
+            } else {
+                div.innerHTML = text.replace(/\n/g, '<br>');
+            }
+            
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
         }

@@ -4,156 +4,203 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comparador de DMs (IA)</title>
-    <!-- Importamos una fuente bonita de Google -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Vinculamos el archivo CSS externo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- CREADOR DE PERSONAJE -->
+    <!-- OVERLAY DE ANIMACIÓN DE DADOS -->
+    <div id="dice-overlay">
+        <div class="dice-stage">
+            <div id="dice-anim-container">
+                <!-- Aquí se inyectará el SVG del dado -->
+            </div>
+            <div id="dice-anim-result" class="dice-result-number">20</div>
+        </div>
+        <h2 style="margin-top: 20px; color: #fff; text-shadow: 0 0 10px black;">¡El destino decide!</h2>
+    </div>
+
+    <!-- PANTALLA DE CONFIGURACIÓN Y MENÚ -->
     <div id="setup-screen">
-        <div>
-            <h1>🧙‍♂️ Creador de Héroe</h1>
-            <p class="subtitle">Diseña tu personaje y deja que las IAs narren tu destino.</p>
-        </div>
-
-        <div class="char-form">
-            <div class="form-group full-width">
-                <label>Nombre del Héroe</label>
-                <input type="text" id="char-name" class="setup-input" placeholder="Ej: Arin Bjornsson">
-            </div>
-
-            <div class="form-group">
-                <label>Raza</label>
-                <select id="char-race" class="setup-select">
-                    <option value="Humano">Humano</option>
-                    <option value="Elfo">Elfo</option>
-                    <option value="Enano">Enano</option>
-                    <option value="Mediano">Mediano</option>
-                    <option value="Orco">Orco</option>
-                    <option value="Tiefling">Tiefling</option>
-                    <option value="Dracónido">Dracónido</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Clase</label>
-                <select id="char-class" class="setup-select">
-                    <option value="Guerrero">Guerrero</option>
-                    <option value="Mago">Mago</option>
-                    <option value="Pícaro">Pícaro</option>
-                    <option value="Clérigo">Clérigo</option>
-                    <option value="Explorador">Explorador</option>
-                    <option value="Paladín">Paladín</option>
-                    <option value="Bardo">Bardo</option>
-                    <option value="Bárbaro">Bárbaro</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Alineamiento</label>
-                <select id="char-align" class="setup-select">
-                    <option value="Legal Bueno">Legal Bueno</option>
-                    <option value="Neutral Bueno">Neutral Bueno</option>
-                    <option value="Caótico Bueno">Caótico Bueno</option>
-                    <option value="Legal Neutral">Legal Neutral</option>
-                    <option value="Neutral Auténtico">Neutral Auténtico</option>
-                    <option value="Caótico Neutral">Caótico Neutral</option>
-                    <option value="Legal Malvado">Legal Malvado</option>
-                    <option value="Neutral Malvado">Neutral Malvado</option>
-                    <option value="Caótico Malvado">Caótico Malvado</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Trasfondo</label>
-                <select id="char-bg" class="setup-select">
-                    <option value="Soldado">Soldado</option>
-                    <option value="Criminal">Criminal</option>
-                    <option value="Erudito">Erudito</option>
-                    <option value="Noble">Noble</option>
-                    <option value="Héroe del Pueblo">Héroe del Pueblo</option>
-                    <option value="Acolito">Acólito</option>
-                    <option value="Ermitaño">Ermitaño</option>
-                </select>
-            </div>
-        </div>
         
-        <button onclick="startGame()" class="main-btn">COMENZAR AVENTURA</button>
+        <!-- Sección Superior: Creador de Personaje -->
+        <div class="creator-column">
+            <div>
+                <h1>📜 Crónicas del Héroe</h1>
+                <p class="subtitle">Forja tu leyenda y desafía a los Dioses.</p>
+            </div>
+
+            <div class="char-form">
+                <div class="form-group full-width">
+                    <label>Nombre del Héroe</label>
+                    <input type="text" id="char-name" class="setup-input" placeholder="Ej: Arin Bjornsson">
+                </div>
+
+                <div class="form-group">
+                    <label>Raza</label>
+                    <select id="char-race" class="setup-select">
+                        <option value="Humano">Humano</option>
+                        <option value="Elfo">Elfo</option>
+                        <option value="Enano">Enano</option>
+                        <option value="Mediano">Mediano</option>
+                        <option value="Orco">Orco</option>
+                        <option value="Tiefling">Tiefling</option>
+                        <option value="Dracónido">Dracónido</option>
+                        <option value="Gnomo">Gnomo</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Clase</label>
+                    <select id="char-class" class="setup-select">
+                        <option value="Guerrero">Guerrero</option>
+                        <option value="Mago">Mago</option>
+                        <option value="Pícaro">Pícaro</option>
+                        <option value="Clérigo">Clérigo</option>
+                        <option value="Explorador">Explorador</option>
+                        <option value="Paladín">Paladín</option>
+                        <option value="Bardo">Bardo</option>
+                        <option value="Bárbaro">Bárbaro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Alineamiento</label>
+                    <select id="char-align" class="setup-select">
+                        <option value="Legal Bueno">Legal Bueno</option>
+                        <option value="Neutral Bueno">Neutral Bueno</option>
+                        <option value="Caótico Bueno">Caótico Bueno</option>
+                        <option value="Legal Neutral">Legal Neutral</option>
+                        <option value="Neutral Auténtico">Neutral Auténtico</option>
+                        <option value="Caótico Neutral">Caótico Neutral</option>
+                        <option value="Legal Malvado">Legal Malvado</option>
+                        <option value="Neutral Malvado">Neutral Malvado</option>
+                        <option value="Caótico Malvado">Caótico Malvado</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Trasfondo</label>
+                    <select id="char-bg" class="setup-select">
+                        <option value="Soldado">Soldado</option>
+                        <option value="Criminal">Criminal</option>
+                        <option value="Erudito">Erudito</option>
+                        <option value="Noble">Noble</option>
+                        <option value="Héroe del Pueblo">Héroe del Pueblo</option>
+                        <option value="Acolito">Acólito</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Compañía</label>
+                    <select id="party-size" class="setup-select">
+                        <option value="Lobo Solitario">Lobo Solitario</option>
+                        <option value="Dúo">Dúo (Con 1 Aliado)</option>
+                        <option value="Grupo Pequeño">Grupo Pequeño (3 PJs)</option>
+                        <option value="Grupo Clásico">Grupo Clásico (4-5 PJs)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Tono</label>
+                    <select id="story-tone" class="setup-select">
+                        <option value="Fantasía Épica">Fantasía Épica</option>
+                        <option value="Fantasía Oscura">Fantasía Oscura</option>
+                        <option value="Misterio">Misterio</option>
+                        <option value="Terror">Terror</option>
+                        <option value="Comedia">Comedia</option>
+                    </select>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Rumbo de la Historia</label>
+                    <textarea id="story-context" class="setup-input" placeholder="Ej: Buscamos una cura para una plaga mágica..."></textarea>
+                </div>
+            </div>
+            
+            <button onclick="startGame()" id="btn-start-game" class="main-btn">⚔️ Comenzar Nueva Aventura ⚔️</button>
+        </div>
+
+        <!-- Sección Inferior: Historial de Partidas -->
+        <div class="history-column">
+            <h2>Partidas Guardadas</h2>
+            <div id="games-list" class="history-list">
+                <div style="color: #666; font-style: italic; padding: 10px;">Consultando los archivos...</div>
+            </div>
+        </div>
     </div>
 
     <!-- PANTALLA DE JUEGO -->
     <div id="game-screen">
+        <div class="char-hud">
+            <div class="hud-avatar">🛡️</div>
+            <div class="hud-item">
+                <span class="hud-label">Héroe</span>
+                <span class="hud-value" id="hud-name">-</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-label">Clase/Raza</span>
+                <span class="hud-value" id="hud-details">-</span>
+            </div>
+            
+            <button onclick="location.reload()" class="back-btn">❌ Salir al Menú</button>
+        </div>
+
         <div class="arena">
             <div class="column">
-                <h2>Llama 3.1 8B (Rápido)</h2>
+                <h2>📜 Llama 3.1 8B (Rápido)</h2>
                 <div class="log-container" id="log-1"></div>
             </div>
             <div class="column">
-                <h2>Llama 3.3 70B (Inteligente)</h2>
+                <h2>🔮 Llama 3.3 70B (Inteligente)</h2>
                 <div class="log-container" id="log-2"></div>
             </div>
         </div>
 
-        <div class="loader" id="loader">✨ Los DMs están tejiendo el destino...</div>
+        <div class="loader" id="loader">🕯️ Los oráculos consultan los pergaminos... 🕯️</div>
 
-        <!-- Panel de control -->
         <div class="input-area">
-            
-            <!-- INPUT OCULTO PARA ALMACENAR EL VALOR SELECCIONADO -->
             <input type="hidden" id="dice-select" value="none">
 
-            <!-- DROPDOWN PERSONALIZADO -->
+            <!-- DROPDOWN MEJORADO -->
             <div class="custom-dropdown" id="dice-dropdown">
                 <div class="dropdown-btn" onclick="toggleDiceMenu()">
                     <div class="selected-value" id="selected-dice-display">
-                        <span>🚫</span> <span>Sin dado</span>
+                        <span>🚫</span> <span>Elegir Dado</span>
                     </div>
                     <span class="arrow-icon">▼</span>
                 </div>
                 
                 <div class="dropdown-content" id="dice-options">
-                    <div class="dropdown-item" onclick="selectDice('none', '🚫', 'Sin dado')">
-                        <span>🚫</span> Sin dado
-                    </div>
-                    <div class="dropdown-item" onclick="selectDice('20', getDiceSvg('d20'), 'd20 (Acierto)')">
-                        <!-- SVG d20 -->
-                        <svg class="dice-svg" viewBox="0 0 24 24"><path d="M12 2L2 8l10 6 10-6-10-6zm0 2.2l6.5 3.9-6.5 3.9-6.5-3.9L12 4.2zM2.2 9.5l9.3 5.5v9l-9.3-5.5v-9zm19.6 0v9l-9.3 5.5v-9l9.3-5.5z"/></svg>
+                    <!-- Las opciones de dados (d20, d12, etc.) -->
+                    <div class="dropdown-item" onclick="triggerDiceRoll('20', getDiceSvg('d20'))">
+                        <svg class="dice-svg" viewBox="0 0 512 512"><path d="M256 0L58.6 122.3l49.8 199.1L256 464l147.6-142.6 49.8-199.1L256 0zm0 41.1l157.9 97.8-87.3 125.7L256 376.1l-70.6-111.5-87.3-125.7L256 41.1zm-18.9 148l-98-34.9 66.8 96 31.2 49.3zm37.8 0v110.4l31.2-49.3 66.8-96-98 34.9z"/></svg>
                         d20 (Acierto)
                     </div>
-                    <div class="dropdown-item" onclick="selectDice('12', getDiceSvg('d12'), 'd12 (Daño)')">
-                        <!-- SVG d12 -->
-                        <svg class="dice-svg" viewBox="0 0 24 24"><path d="M12 2l8.5 6-3.3 9.9H6.8L3.5 8 12 2zm0 2.5L5.8 8l2.2 6.5h8L18.2 8 12 4.5z"/></svg>
+                    <div class="dropdown-item" onclick="triggerDiceRoll('12', getDiceSvg('d12'))">
+                        <svg class="dice-svg" viewBox="0 0 512 512"><path d="M256 48L95.5 164.5l61.3 189h198.4l61.3-189L256 48zm0 50.4l112.5 81.6-43 132.3H186.5l-43-132.3L256 98.4z"/></svg>
                         d12 (Daño)
                     </div>
-                    <div class="dropdown-item" onclick="selectDice('10', getDiceSvg('d10'), 'd10 (Daño)')">
-                        <!-- SVG d10 -->
-                        <svg class="dice-svg" viewBox="0 0 24 24"><path d="M12 2L4 12l8 10 8-10-8-10zm0 2.5l5.5 8.7L12 19.3 6.5 13.2 12 4.5z"/></svg>
+                    <div class="dropdown-item" onclick="triggerDiceRoll('10', getDiceSvg('d10'))">
+                        <svg class="dice-svg" viewBox="0 0 512 512"><path d="M256 16L64 256l192 240 192-240L256 16zm0 53.3l122.7 154.7L256 378.7 133.3 224 256 69.3z"/></svg>
                         d10 (Daño)
                     </div>
-                    <div class="dropdown-item" onclick="selectDice('8', getDiceSvg('d8'), 'd8 (Daño)')">
-                        <!-- SVG d8 -->
-                        <svg class="dice-svg" viewBox="0 0 24 24"><path d="M12 2L2 12l10 10 10-10L12 2zm0 2.8L19.2 12 12 19.2 4.8 12 12 4.8z"/></svg>
+                    <div class="dropdown-item" onclick="triggerDiceRoll('8', getDiceSvg('d8'))">
+                        <svg class="dice-svg" viewBox="0 0 512 512"><path d="M256 16L32 256l224 240 224-240L256 16zm0 53.3l138.7 149.3L256 368 117.3 218.7 256 69.3z"/></svg>
                         d8 (Daño)
                     </div>
-                    <div class="dropdown-item" onclick="selectDice('6', getDiceSvg('d6'), 'd6 (Corto)')">
-                        <!-- SVG d6 -->
-                        <svg class="dice-svg" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" ry="2" stroke-width="2"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="16" cy="8" r="1.5" fill="currentColor"/><circle cx="8" cy="16" r="1.5" fill="currentColor"/></svg>
+                    <div class="dropdown-item" onclick="triggerDiceRoll('6', getDiceSvg('d6'))">
+                        <svg class="dice-svg" viewBox="0 0 512 512"><path d="M64 64v384h384V64H64zm96 96c17.7 0 32 14.3 32 32s-14.3 32-32 32-32-14.3-32-32 14.3-32 32-32zm0 160c17.7 0 32 14.3 32 32s-14.3 32-32 32-32-14.3-32-32 14.3-32 32-32zm192 0c17.7 0 32 14.3 32 32s-14.3 32-32 32-32-14.3-32-32 14.3-32 32-32zm0-160c17.7 0 32 14.3 32 32s-14.3 32-32 32-32-14.3-32-32 14.3-32 32-32z"/></svg>
                         d6 (Corto)
                     </div>
-                    <div class="dropdown-item" onclick="selectDice('4', getDiceSvg('d4'), 'd4 (Poción)')">
-                        <!-- SVG d4 -->
-                        <svg class="dice-svg" viewBox="0 0 24 24"><path d="M12 2L3 20h18L12 2zm0 3.5l6.5 13h-13l6.5-13z"/></svg>
+                    <div class="dropdown-item" onclick="triggerDiceRoll('4', getDiceSvg('d4'))">
+                        <svg class="dice-svg" viewBox="0 0 512 512"><path d="M256 16L32 400h448L256 16zm0 74.7L392.5 352H119.5L256 90.7z"/></svg>
                         d4 (Poción)
-                    </div>
-                    <div class="dropdown-item" onclick="selectDice('100', '💯', 'd100 (%)')">
-                        <span>💯</span> d100 (%)
                     </div>
                 </div>
             </div>
             
-            <input type="text" id="user-action" placeholder="Describe tu acción heroica..." onkeypress="handleEnter(event)" autocomplete="off">
+            <input type="text" id="user-action" placeholder="Narra tu acción..." onkeypress="handleEnter(event)" autocomplete="off">
             <button onclick="sendTurn()" id="btn-send" class="main-btn">ENVIAR</button>
         </div>
     </div>
@@ -161,7 +208,86 @@
     <script>
         let currentGameId = null;
 
-        // --- Funciones del Dropdown Personalizado ---
+        document.addEventListener('DOMContentLoaded', loadGamesList);
+
+        // --- Lógica de Juegos --- (Igual que antes)
+        async function loadGamesList() {
+            const list = document.getElementById('games-list');
+            try {
+                const res = await fetch('/api/games');
+                const games = await res.json();
+                
+                if(games.length === 0) {
+                    list.innerHTML = '<div style="padding:10px; color:#666;">No hay crónicas guardadas.</div>';
+                    return;
+                }
+
+                list.innerHTML = '';
+                games.forEach(g => {
+                    const date = new Date(g.created_at).toLocaleDateString() + ' ' + new Date(g.created_at).toLocaleTimeString().slice(0,5);
+                    const nameMatch = g.system_prompt.match(/Nombre: (.*?)\n/);
+                    const heroName = nameMatch ? nameMatch[1] : `Aventura #${g.id}`;
+
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+                    item.innerHTML = `
+                        <div class="history-info" onclick="loadGame(${g.id}, '${heroName}')">
+                            <span class="history-name">${heroName}</span>
+                            <span class="history-date">${date}</span>
+                        </div>
+                        <button class="delete-btn" onclick="deleteGame(${g.id})" title="Borrar Crónica">🗑️</button>
+                    `;
+                    list.appendChild(item);
+                });
+            } catch(e) {
+                console.error(e);
+                list.innerHTML = '<div style="color:red">Error cargando crónicas.</div>';
+            }
+        }
+
+        async function deleteGame(id) {
+            if(!confirm("¿Estás seguro de querer quemar este pergamino? No hay vuelta atrás.")) return;
+            try {
+                await fetch(`/api/games/${id}`, { method: 'DELETE' });
+                loadGamesList();
+            } catch(e) {
+                alert("Error al borrar.");
+            }
+        }
+
+        async function loadGame(id, heroName) {
+            currentGameId = id;
+            document.getElementById('setup-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'flex';
+            document.getElementById('hud-name').innerText = heroName;
+            document.getElementById('hud-details').innerText = "Cargado";
+            
+            const log1 = document.getElementById('log-1');
+            const log2 = document.getElementById('log-2');
+            log1.innerHTML = ''; 
+            log2.innerHTML = '';
+
+            try {
+                const res = await fetch(`/api/history/${id}`);
+                const messages = await res.json();
+                
+                messages.forEach(msg => {
+                    const txt = parseSimpleMarkdown(msg.content);
+                    if(msg.dm_id === 0) {
+                        addMessageToLog(1, 'user', txt, true);
+                        addMessageToLog(2, 'user', txt, true);
+                    } else if (msg.dm_id === 1) {
+                        addMessageToLog(1, 'ai', txt, true);
+                    } else if (msg.dm_id === 2) {
+                        addMessageToLog(2, 'ai', txt, true);
+                    }
+                });
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        // --- NUEVA LÓGICA DE ANIMACIÓN DE DADOS ---
         
         function toggleDiceMenu() {
             const dropdown = document.getElementById('dice-dropdown');
@@ -170,7 +296,6 @@
             dropdown.classList.toggle('active');
         }
 
-        // Cierra el dropdown si clicas fuera
         window.onclick = function(event) {
             if (!event.target.matches('.dropdown-btn') && !event.target.matches('.dropdown-btn *')) {
                 const contents = document.getElementsByClassName("dropdown-content");
@@ -185,52 +310,97 @@
         }
 
         function getDiceSvg(type) {
-            // Helper para devolver el HTML del SVG según el tipo, para pintar el seleccionado
-            // Copiamos los paths definidos en el HTML arriba
             const paths = {
-                'd20': 'M12 2L2 8l10 6 10-6-10-6zm0 2.2l6.5 3.9-6.5 3.9-6.5-3.9L12 4.2zM2.2 9.5l9.3 5.5v9l-9.3-5.5v-9zm19.6 0v9l-9.3 5.5v-9l9.3-5.5z',
-                'd12': 'M12 2l8.5 6-3.3 9.9H6.8L3.5 8 12 2zm0 2.5L5.8 8l2.2 6.5h8L18.2 8 12 4.5z',
-                'd10': 'M12 2L4 12l8 10 8-10-8-10zm0 2.5l5.5 8.7L12 19.3 6.5 13.2 12 4.5z',
-                'd8': 'M12 2L2 12l10 10 10-10L12 2zm0 2.8L19.2 12 12 19.2 4.8 12 12 4.8z',
-                'd4': 'M12 2L3 20h18L12 2zm0 3.5l6.5 13h-13l6.5-13z',
-                'd6': '<rect x="4" y="4" width="16" height="16" rx="2" ry="2" stroke-width="2"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="16" cy="8" r="1.5" fill="currentColor"/><circle cx="8" cy="16" r="1.5" fill="currentColor"/>'
+                'd20': 'M256 0L58.6 122.3l49.8 199.1L256 464l147.6-142.6 49.8-199.1L256 0zm0 41.1l157.9 97.8-87.3 125.7L256 376.1l-70.6-111.5-87.3-125.7L256 41.1zm-18.9 148l-98-34.9 66.8 96 31.2 49.3zm37.8 0v110.4l31.2-49.3 66.8-96-98 34.9z',
+                'd12': 'M256 48L95.5 164.5l61.3 189h198.4l61.3-189L256 48zm0 50.4l112.5 81.6-43 132.3H186.5l-43-132.3L256 98.4z',
+                'd10': 'M256 16L64 256l192 240 192-240L256 16zm0 53.3l122.7 154.7L256 378.7 133.3 224 256 69.3z',
+                'd8': 'M256 16L32 256l224 240 224-240L256 16zm0 53.3l138.7 149.3L256 368 117.3 218.7 256 69.3z',
+                'd6': 'M64 64v384h384V64H64zm96 96c17.7 0 32 14.3 32 32s-14.3 32-32 32-32-14.3-32-32 14.3-32 32-32zm0 160c17.7 0 32 14.3 32 32s-14.3 32-32 32-32-14.3-32-32 14.3-32 32-32zm192 0c17.7 0 32 14.3 32 32s-14.3 32-32 32-32-14.3-32-32 14.3-32 32-32zm0-160c17.7 0 32 14.3 32 32s-14.3 32-32 32-32-14.3-32-32 14.3-32 32-32z',
+                'd4': 'M256 16L32 400h448L256 16zm0 74.7L392.5 352H119.5L256 90.7z'
             };
-            
-            if (type === 'd6') return `<svg class="dice-svg" viewBox="0 0 24 24">${paths.d6}</svg>`;
-            if (paths[type]) return `<svg class="dice-svg" viewBox="0 0 24 24"><path d="${paths[type]}"/></svg>`;
+            if(paths[type]) return `<svg class="dice-anim-svg" viewBox="0 0 512 512"><path d="${paths[type]}"/></svg>`;
             return '🎲';
         }
 
-        function selectDice(value, iconHtml, text) {
-            // 1. Actualizar valor oculto (lógica original)
-            document.getElementById('dice-select').value = value;
-            
-            // 2. Actualizar visualización
-            const display = document.getElementById('selected-dice-display');
-            
-            // Si es un SVG string (como el de getDiceSvg o el HTML literal), lo ponemos tal cual
-            // Si es un emoji simple, lo ponemos en span
-            if (iconHtml.includes('<svg') || iconHtml.includes('🚫') || iconHtml.includes('💯')) {
-                 display.innerHTML = `<span>${iconHtml}</span> <span>${text}</span>`;
-            } else {
-                 display.innerHTML = `<span>${iconHtml}</span> <span>${text}</span>`;
-            }
-
-            // 3. Cerrar menú
+        // Función principal que desencadena todo
+        function triggerDiceRoll(sidesStr, svgHtml) {
+            // 1. Cerrar menú
             toggleDiceMenu();
+            
+            // 2. Calcular resultado
+            const sides = parseInt(sidesStr);
+            const roll = Math.floor(Math.random() * sides) + 1;
+            
+            // 3. Mostrar Overlay y Preparar Animación
+            const overlay = document.getElementById('dice-overlay');
+            const container = document.getElementById('dice-anim-container');
+            const resultElem = document.getElementById('dice-anim-result');
+            
+            container.innerHTML = svgHtml; // Insertar SVG
+            resultElem.innerText = roll;
+            resultElem.classList.remove('show');
+            
+            // Resetear animación
+            container.classList.remove('rolling');
+            void container.offsetWidth; // Trigger reflow
+            
+            // Mostrar y Animar
+            overlay.style.display = 'flex';
+            container.classList.add('rolling');
+            
+            // 4. Secuencia temporal
+            setTimeout(() => {
+                // Mostrar número
+                resultElem.classList.add('show');
+            }, 1200); // Un poco antes de terminar la rotación
+
+            setTimeout(() => {
+                // Cerrar y Enviar
+                overlay.style.display = 'none';
+                sendRollResult(sides, roll);
+            }, 2500); // Tiempo para ver el resultado
+        }
+
+        // Envío automático tras la animación
+        function sendRollResult(sides, roll) {
+            const input = document.getElementById('user-action');
+            let actionText = input.value.trim();
+            
+            // Colores para el log
+            let colorClass = '#a78bfa';
+            if(sides === 20 && roll === 20) colorClass = '#10b981'; 
+            if(sides === 20 && roll === 1) colorClass = '#ef4444'; 
+
+            const diceTag = `<span class="dice-result">[🎲 d${sides}: <strong style="color:${colorClass}">${roll}</strong>]</span>`;
+            
+            let displayAction = actionText ? `${actionText} ${diceTag}` : diceTag;
+            
+            // Enviar
+            performTurn(displayAction);
+            input.value = ''; // Limpiar input si había texto
+        }
+
+        function parseSimpleMarkdown(text) {
+            if (!text) return "";
+            let html = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/^- (.*)$/gm, '<ul><li>$1</li></ul>')
+                .replace(/\n/g, '<br>');
+            html = html.replace(/<\/ul><br><ul>/g, ''); 
+            return html;
         }
 
         async function startGame() {
-            // Recoger datos del formulario
             const name = document.getElementById('char-name').value.trim() || "Aventurero Desconocido";
             const race = document.getElementById('char-race').value;
             const charClass = document.getElementById('char-class').value;
             const align = document.getElementById('char-align').value;
             const bg = document.getElementById('char-bg').value;
-
-            // CONSTRUCCIÓN DEL PROMPT ELABORADO
+            const partySize = document.getElementById('party-size').value;
+            // CONSTRUIR PROMPT EXTENDIDO
             const elaboratePrompt = `
-Eres un Dungeon Master experto de Dungeons & Dragons 5e. Tu trabajo es narrar una aventura inmersiva, oscura y emocionante.
+Eres un Dungeon Master experto de Dungeons & Dragons 5e. Tu trabajo es narrar una aventura inmersiva y emocionante.
 
 DETALLES DEL JUGADOR:
 - Nombre: ${name}
@@ -239,15 +409,24 @@ DETALLES DEL JUGADOR:
 - Alineamiento: ${align}
 - Trasfondo: ${bg}
 
-REGLAS DE DIRECCIÓN:
-1. Actúa como el DM: describe el entorno, los NPCs y las consecuencias. NUNCA decidas las acciones ni los diálogos del jugador.
-2. Sé descriptivo: usa los sentidos (olores, sonidos, atmósfera).
-3. Mecánicas: Si el jugador hace una tirada de dados (ej: [🎲 Tirada d20: 15]), interpreta el resultado. Si es bajo, falla con consecuencias; si es alto, ten éxito.
-4. Contexto Inicial: Comienza la aventura en una situación interesante relacionada con su trasfondo de ${bg}.
+CONFIGURACIÓN:
+- Compañía: ${partySize}.
+- Tono: ${tone}.
+- Objetivo: ${storyContext || "A elección del DM."}
+
+REGLAS DE DIRECCIÓN (IMPORTANTE):
+1. **Actúa como el DM**: describe el entorno, los NPCs y las consecuencias. NUNCA decidas las acciones, pensamientos ni diálogos del jugador.
+2. **GUÍA AL JUGADOR**: No termines con un simple "¿qué haces?". Al final de tu descripción, **sugiere siempre 2 o 3 opciones claras** de lo que podría hacer el personaje en esa situación (ej: "Podrías intentar forzar la puerta, buscar otra entrada por la ventana o escuchar si hay alguien dentro").
+3. **SOLICITA TIRADAS**: Cuando el jugador elija una acción con riesgo de fallo, o si la situación lo requiere (como percibir un peligro), **DETÉN la narración y pide explícitamente una tirada** (ej: "Haz una tirada de Sigilo" o "Tira Iniciativa"). No asumas el éxito sin ver el dado.
+4. **Interpreta los Dados**: Si el mensaje del jugador incluye una tirada (ej: [🎲 15]), usa ese número para determinar el éxito o fracaso comparándolo con una CD oculta.
+5. **Mecánicas D&D 5e**:
+   - Usa ventaja/desventaja si aplica.
+   - Gestiona inventario y salud narrativamente.
+   - En combate, usa turnos.
             `.trim();
 
-            // UI Updates
-            const btn = document.querySelector('#setup-screen button');
+            // CORRECCIÓN: Usamos el ID específico del botón para evitar errores
+            const btn = document.getElementById('btn-start-game');
             btn.innerText = "Invocando IAs...";
             btn.disabled = true;
 
@@ -261,19 +440,13 @@ REGLAS DE DIRECCIÓN:
                 
                 if (data.gameId) {
                     currentGameId = data.gameId;
-                    
-                    const setup = document.getElementById('setup-screen');
-                    setup.style.opacity = '0';
-                    setTimeout(() => {
-                        setup.style.display = 'none';
-                        const game = document.getElementById('game-screen');
-                        game.style.display = 'flex';
-                        game.style.animation = 'fadeIn 0.5s ease-out';
-                        
-                        if (data.dm1) addMessageToLog(1, 'ai', data.dm1);
-                        if (data.dm2) addMessageToLog(2, 'ai', data.dm2);
-                        
-                    }, 300);
+                    document.getElementById('setup-screen').style.display = 'none';
+                    document.getElementById('game-screen').style.display = 'flex';
+                    document.getElementById('log-1').innerHTML = '';
+                    document.getElementById('log-2').innerHTML = '';
+
+                    if (data.dm1) addMessageToLog(1, 'ai', parseSimpleMarkdown(data.dm1), true);
+                    if (data.dm2) addMessageToLog(2, 'ai', parseSimpleMarkdown(data.dm2), true);
                 }
             } catch (err) {
                 alert("Error conectando con el servidor");
@@ -282,58 +455,35 @@ REGLAS DE DIRECCIÓN:
             }
         }
 
+        // Función manual "ENVIAR" (sin dado)
         async function sendTurn() {
             const input = document.getElementById('user-action');
-            // Usamos el input oculto ahora
-            const dieValue = document.getElementById('dice-select').value;
-            
             let actionText = input.value.trim();
-
-            if (!actionText && dieValue === 'none') return;
-
-            let displayAction = actionText; 
-
-            if (dieValue !== 'none') {
-                const sides = parseInt(dieValue);
-                const roll = Math.floor(Math.random() * sides) + 1;
-                // Usamos colores para el dado según si es crítico o pifia visualmente
-                let colorClass = '#a78bfa';
-                if(sides === 20 && roll === 20) colorClass = '#10b981'; // Verde crítico
-                if(sides === 20 && roll === 1) colorClass = '#ef4444';  // Rojo pifia
-
-                const diceTag = `[🎲 Tirada d${sides}: <strong style="color:${colorClass}">${roll}</strong>]`;
-                
-                if (displayAction) {
-                    displayAction += " " + diceTag;
-                } else {
-                    displayAction = diceTag;
-                }
-            }
-
+            if (!actionText) return;
+            performTurn(actionText);
             input.value = '';
+        }
+
+        // Lógica central de envío al backend
+        async function performTurn(displayText) {
             const btn = document.getElementById('btn-send');
             btn.disabled = true;
             document.getElementById('loader').style.display = 'block';
 
-            addMessageToLog(1, 'user', displayAction, true);
-            addMessageToLog(2, 'user', displayAction, true);
-
-            // Reseteamos el selector de dados VISUAL y el valor oculto
-            if (dieValue !== 'none') {
-               selectDice('none', '🚫', 'Sin dado');
-            }
+            addMessageToLog(1, 'user', displayText, true);
+            addMessageToLog(2, 'user', displayText, true);
 
             try {
                 const res = await fetch('/api/turn', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ gameId: currentGameId, userAction: displayAction })
+                    body: JSON.stringify({ gameId: currentGameId, userAction: displayText })
                 });
                 
                 const data = await res.json();
 
-                addMessageToLog(1, 'ai', data.dm1 || "Error recibiendo respuesta");
-                addMessageToLog(2, 'ai', data.dm2 || "Error recibiendo respuesta");
+                addMessageToLog(1, 'ai', parseSimpleMarkdown(data.dm1) || "Error", true);
+                addMessageToLog(2, 'ai', parseSimpleMarkdown(data.dm2) || "Error", true);
 
             } catch (err) {
                 console.error(err);
@@ -341,6 +491,7 @@ REGLAS DE DIRECCIÓN:
             } finally {
                 btn.disabled = false;
                 document.getElementById('loader').style.display = 'none';
+                const input = document.getElementById('user-action');
                 input.focus();
             }
         }
@@ -353,11 +504,11 @@ REGLAS DE DIRECCIÓN:
             if (isHtml) {
                 div.innerHTML = text;
             } else {
-                div.innerHTML = text.replace(/\n/g, '<br>');
+                div.innerText = text;
             }
             
             container.appendChild(div);
-            container.scrollTop = container.scrollHeight;
+            container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
         }
 
         function handleEnter(e) {

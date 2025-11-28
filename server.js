@@ -31,7 +31,7 @@ db.serialize(() => {
         role TEXT,
         content TEXT,
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(game_id) REFERENCES games(id)
+        FOREIGN KEY(game_id) REFERENCES games(id) ON DELETE CASCADE
     )`);
 });
 
@@ -43,33 +43,29 @@ const groqClient = new OpenAI({
 
 // --- RUTAS ---
 
-// 1. Iniciar Partida Y Generar Intro (MODIFICADO)
+// 1. Iniciar Partida
 app.post('/api/start', async (req, res) => {
     const { systemPrompt } = req.body;
     
-    // 1. Crear la partida en BD
     db.run("INSERT INTO games (system_prompt) VALUES (?)", [systemPrompt], async function(err) {
         if (err) return res.status(500).json({ error: err.message });
         
         const gameId = this.lastID;
-        const introTrigger = "Describe la escena inicial detalladamente para comenzar la aventura.";
+        // Prompt simplificado para que no repitan tanto texto al inicio
+        const introTrigger = "Narra la introducción de la aventura basándote en el contexto proporcionado. Sé breve y directo.";
 
         try {
-            // 2. Pedir a las IAs la introducción inmediatamente
-            // Nota: Pasamos un historial vacío porque es el inicio
             const results = await Promise.allSettled([
                 callLlamaFastViaGroq(systemPrompt, [], introTrigger),
                 callLlamaSmartViaGroq(systemPrompt, [], introTrigger)
             ]);
 
-            const intro1 = results[0].status === 'fulfilled' ? results[0].value : "Error generando intro 1.";
-            const intro2 = results[1].status === 'fulfilled' ? results[1].value : "Error generando intro 2.";
+            const intro1 = results[0].status === 'fulfilled' ? results[0].value : "Error generando intro.";
+            const intro2 = results[1].status === 'fulfilled' ? results[1].value : "Error generando intro.";
 
-            // 3. Guardar estas introducciones en la BD como mensajes del modelo
             await saveMessage(gameId, 1, 'model', intro1);
             await saveMessage(gameId, 2, 'model', intro2);
 
-            // 4. Devolver todo al frontend
             res.json({ 
                 gameId: gameId, 
                 message: "Partida iniciada",
@@ -84,6 +80,7 @@ app.post('/api/start', async (req, res) => {
     });
 });
 
+// 2. Turno
 app.post('/api/turn', async (req, res) => {
     const { gameId, userAction } = req.body;
 
@@ -97,24 +94,19 @@ app.post('/api/turn', async (req, res) => {
 
         if (!game) return res.status(404).json({ error: "Partida no encontrada" });
 
-        // Guardar acción usuario
         await saveMessage(gameId, 0, 'user', userAction);
 
-        // Obtener historiales
         const history1 = await getHistory(gameId, 1);
         const history2 = await getHistory(gameId, 2);
 
-        // Llamada a APIs en Paralelo
         const results = await Promise.allSettled([
             callLlamaFastViaGroq(game.system_prompt, history1, userAction),
             callLlamaSmartViaGroq(game.system_prompt, history2, userAction)
         ]);
 
-        // Extraer resultados
-        const response1 = results[0].status === 'fulfilled' ? results[0].value : "Error Llama Fast: " + results[0].reason;
-        const response2 = results[1].status === 'fulfilled' ? results[1].value : "Error Llama Smart: " + results[1].reason;
+        const response1 = results[0].status === 'fulfilled' ? results[0].value : "Error: " + results[0].reason;
+        const response2 = results[1].status === 'fulfilled' ? results[1].value : "Error: " + results[1].reason;
 
-        // Guardar respuestas
         await saveMessage(gameId, 1, 'model', response1);
         await saveMessage(gameId, 2, 'model', response2);
 
@@ -126,11 +118,34 @@ app.post('/api/turn', async (req, res) => {
     }
 });
 
+// 3. Historial de mensajes (Cargar Partida)
 app.get('/api/history/:gameId', (req, res) => {
     const gameId = req.params.gameId;
     db.all("SELECT * FROM messages WHERE game_id = ? ORDER BY timestamp ASC", [gameId], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(rows);
+    });
+});
+
+// 4. Listar todas las partidas (NUEVO)
+app.get('/api/games', (req, res) => {
+    // Intentamos extraer el nombre del personaje del prompt si es posible, sino mostramos fecha
+    db.all("SELECT id, created_at, system_prompt FROM games ORDER BY created_at DESC", [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows);
+    });
+});
+
+// 5. Eliminar partida (NUEVO)
+app.delete('/api/games/:id', (req, res) => {
+    const id = req.params.id;
+    // Borramos mensajes primero (aunque con CASCADE no haría falta en BBDD serias, SQLite a veces requiere config)
+    db.run("DELETE FROM messages WHERE game_id = ?", [id], (err) => {
+        if(err) console.error(err);
+        db.run("DELETE FROM games WHERE id = ?", [id], function(err) {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ message: "Partida eliminada", deleted: this.changes });
+        });
     });
 });
 
@@ -156,16 +171,12 @@ function getHistory(gameId, dmId) {
 }
 
 // --- LÓGICA IAs ---
-
 async function callLlamaFastViaGroq(system, history, currentInput) {
     const messages = [{ role: "system", content: system }];
-    
-    // Mapear 'model' a 'assistant'
     history.forEach(msg => {
         const role = msg.role === 'model' ? 'assistant' : msg.role;
         messages.push({ role: role, content: msg.content });
     });
-    
     messages.push({ role: "user", content: currentInput });
 
     const completion = await groqClient.chat.completions.create({
@@ -177,12 +188,10 @@ async function callLlamaFastViaGroq(system, history, currentInput) {
 
 async function callLlamaSmartViaGroq(system, history, currentInput) {
     const messages = [{ role: "system", content: system }];
-    
     history.forEach(msg => {
         const role = msg.role === 'model' ? 'assistant' : msg.role;
         messages.push({ role: role, content: msg.content });
     });
-
     messages.push({ role: "user", content: currentInput });
 
     const completion = await groqClient.chat.completions.create({

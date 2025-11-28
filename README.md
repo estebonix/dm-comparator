@@ -34,8 +34,8 @@ Asegúrate de tener instalado:
 
 Abre tu terminal (CMD, PowerShell, Bash, etc.), crea la carpeta del proyecto y entra en ella:
 
-``` mkdir dm-comparator cd dm-comparator
-
+``` 
+mkdir dm-comparator cd dm-comparator
 ```
 
 Asegúrate de copiar todos los archivos (`server.js`, `package.json`, `public/index.html`, `public/style.css`, `.env`) en la estructura correcta.
@@ -44,8 +44,8 @@ Asegúrate de copiar todos los archivos (`server.js`, `package.json`, `public/in
 
 Ejecuta el siguiente comando para instalar las librerías necesarias (incluyendo Express, Dotenv y la librería de Groq):
 
-``` npm install
-
+``` 
+npm install
 ```
 
 ### 4. Configuración del Fichero `.env` (RT4)

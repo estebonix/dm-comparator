@@ -1,11 +1,93 @@
-⚔️ El Comparador de DMs (IA)Descripción del ProyectoEste proyecto es una aplicación web Full-Stack desarrollada para comparar en tiempo real la capacidad narrativa y de dirección de juego (Dungeon Master) de dos Modelos de Lenguaje Grandes (LLMs) distintos.El usuario crea un personaje y una ambientación, e inicia una aventura de Dungeons & Dragons (D&D) que se juega simultáneamente en dos "universos" paralelos, cada uno dirigido por una IA diferente. La aplicación garantiza la persistencia del contexto, permite la gestión de partidas guardadas y utiliza un sistema de tirada de dados con animación para una experiencia inmersiva.Stack Tecnológico:Backend (RT1): Node.js y Express.jsFrontend (RT2): HTML5, CSS (Medieval Style) y JavaScript (Vanilla)Base de Datos (RT5): SQLite (Base de datos SQL mono-archivo)APIs (RT3): Groq (para acceder a los modelos Llama 3.1 y Llama 3.3)🛠️ Instrucciones de Instalación y ConfiguraciónSigue estos pasos para arrancar el proyecto en tu máquina local.1. Requisitos PreviosAsegúrate de tener instalado:Node.js (Versión LTS recomendada)npm (Se instala con Node.js)Git (Para control de versiones)2. Inicialización del ProyectoAbre tu terminal (CMD, PowerShell, Bash, etc.), crea la carpeta del proyecto y entra en ella:mkdir dm-comparator
-cd dm-comparator
-Asegúrate de copiar todos los archivos (server.js, package.json, public/index.html, public/style.css, .env) en la estructura correcta.3. Instalación de DependenciasEjecuta el siguiente comando para instalar las librerías necesarias (incluyendo Express, Dotenv y la librería de Groq):npm install
-4. Configuración del Fichero .env (RT4)Este archivo maneja las claves secretas que nunca deben subir a Git. Debes obtener una clave de API gratuita de Groq.Obtener la clave:Visita https://console.groq.com/keys.Inicia sesión y haz clic en "Create API Key".Copia la clave (gsk_...) y pégala en el archivo .env.Tu archivo .env debe tener este formato:# dm-comparator/.env
-PORT=3000
+# ⚔️ El Comparador de DMs (IA)
 
-# CLAVE DE API Groq
-# SUSTITUYE este valor por tu clave real obtenida de console.groq.com
-GROQ_API_KEY=tu_clave_de_groq_aqui
-5. Arranque del ProyectoUna vez que las dependencias estén instaladas y el .env configurado, puedes arrancar el servidor:npm start
-El servidor se iniciará en http://localhost:3000.🚀 Uso de la AplicaciónAbre http://localhost:3000 en tu navegador.En el "Creador de Héroe" (Hoja de Personaje - Extra), define los detalles y el contexto de la historia.Haz clic en "Comenzar Nueva Aventura".La IA generará automáticamente la introducción en las dos columnas.Para interactuar, escribe tu acción y/o usa el selector de dados.Para guardar y salir, simplemente sal del navegador o haz clic en "Salir al Menú". Las partidas quedarán en la sección "Partidas Guardadas" (Gestión de Partidas - Extra).
+## Descripción del Proyecto
+
+Este proyecto es una aplicación web Full-Stack desarrollada para comparar en tiempo real la capacidad narrativa y de dirección de juego (Dungeon Master) de dos Modelos de Lenguaje Grandes (LLMs) distintos.
+
+El usuario crea un personaje y una ambientación, e inicia una aventura de Dungeons & Dragons (D&D) que se juega simultáneamente en dos "universos" paralelos, cada uno dirigido por una IA diferente. La aplicación garantiza la persistencia del contexto, permite la gestión de partidas guardadas y utiliza un sistema de tirada de dados con animación para una experiencia inmersiva.
+
+Stack Tecnológico:
+
+* Backend (RT1): Node.js y Express.js
+
+* Frontend (RT2): HTML5, CSS (Medieval Style) y JavaScript (Vanilla)
+
+* Base de Datos (RT5): SQLite (Base de datos SQL mono-archivo)
+
+* APIs (RT3): Groq (para acceder a los modelos Llama 3.1 y Llama 3.3)
+
+## 🛠️ Instrucciones de Instalación y Configuración
+
+Sigue estos pasos para arrancar el proyecto en tu máquina local.
+
+### 1. Requisitos Previos
+
+Asegúrate de tener instalado:
+
+* Node.js (Versión LTS recomendada)
+
+* npm (Se instala con Node.js)
+
+* Git (Para control de versiones)
+
+### 2. Inicialización del Proyecto
+
+Abre tu terminal (CMD, PowerShell, Bash, etc.), crea la carpeta del proyecto y entra en ella:
+
+``` mkdir dm-comparator cd dm-comparator
+
+```
+
+Asegúrate de copiar todos los archivos (`server.js`, `package.json`, `public/index.html`, `public/style.css`, `.env`) en la estructura correcta.
+
+### 3. Instalación de Dependencias
+
+Ejecuta el siguiente comando para instalar las librerías necesarias (incluyendo Express, Dotenv y la librería de Groq):
+
+``` npm install
+
+```
+
+### 4. Configuración del Fichero `.env` (RT4)
+
+Este archivo maneja las claves secretas que nunca deben subir a Git. Debes obtener una clave de API gratuita de Groq.
+
+Obtener la clave:
+
+Visita https://console.groq.com/keys.
+
+Inicia sesión y haz clic en "Create API Key".
+
+Copia la clave (`gsk_...`) y pégala en el archivo `.env`.
+
+Tu archivo `.env` debe tener este formato:
+
+``` # dm-comparator/.env PORT=3000
+
+# CLAVE DE API Groq # SUSTITUYE este valor por tu clave real obtenida de console.groq.com GROQ_API_KEY=tu_clave_de_groq_aqui
+
+```
+
+### 5. Arranque del Proyecto
+
+Una vez que las dependencias estén instaladas y el `.env` configurado, puedes arrancar el servidor:
+
+``` npm start
+
+```
+
+El servidor se iniciará en `http://localhost:3000`.
+
+## 🚀 Uso de la Aplicación
+
+Abre `http://localhost:3000` en tu navegador.
+
+En el "Creador de Héroe" (Hoja de Personaje - Extra), define los detalles y el contexto de la historia.
+
+Haz clic en "Comenzar Nueva Aventura".
+
+La IA generará automáticamente la introducción en las dos columnas.
+
+Para interactuar, escribe tu acción y/o usa el selector de dados con animación.
+
+Para guardar y salir, simplemente sal del navegador o haz clic en "Salir al Menú". Las partidas quedarán en la sección "Partidas Guardadas" (Gestión de Partidas - Extra).

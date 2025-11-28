@@ -62,18 +62,21 @@ Copia la clave (`gsk_...`) y pégala en el archivo `.env`.
 
 Tu archivo `.env` debe tener este formato:
 
-``` # dm-comparator/.env PORT=3000
+``` 
+# dm-comparator/.env 
+PORT=3000
 
-# CLAVE DE API Groq # SUSTITUYE este valor por tu clave real obtenida de console.groq.com GROQ_API_KEY=tu_clave_de_groq_aqui
-
+# CLAVE DE API Groq 
+# SUSTITUYE este valor por tu clave real obtenida de console.groq.com 
+GROQ_API_KEY=tu_clave_de_groq_aqui
 ```
 
 ### 5. Arranque del Proyecto
 
 Una vez que las dependencias estén instaladas y el `.env` configurado, puedes arrancar el servidor:
 
-``` npm start
-
+``` 
+npm start
 ```
 
 El servidor se iniciará en `http://localhost:3000`.

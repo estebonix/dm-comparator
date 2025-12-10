@@ -17,7 +17,7 @@
             </div>
             <div id="dice-anim-result" class="dice-result-number">20</div>
         </div>
-        <h2 style="margin-top: 20px; color: #fff; text-shadow: 0 0 10px black;">¡El destino decide!</h2>
+        <h2 style="margin-top: 20px; color: #fff; text-shadow: 0 0 10px black; font-family: 'Cinzel', serif;">¡El destino decide!</h2>
     </div>
 
     <!-- PANTALLA DE CONFIGURACIÓN Y MENÚ -->
@@ -172,7 +172,10 @@
                 </div>
                 
                 <div class="dropdown-content" id="dice-options">
-                    <!-- Las opciones de dados (d20, d12, etc.) -->
+                    <div class="dropdown-item" onclick="selectDice('none', '🚫', 'Sin dado')">
+                        <span>🚫</span> Sin dado
+                    </div>
+                    <!-- Iconos SVGs sólidos -->
                     <div class="dropdown-item" onclick="triggerDiceRoll('20', getDiceSvg('d20'))">
                         <svg class="dice-svg" viewBox="0 0 512 512"><path d="M256 0L58.6 122.3l49.8 199.1L256 464l147.6-142.6 49.8-199.1L256 0zm0 41.1l157.9 97.8-87.3 125.7L256 376.1l-70.6-111.5-87.3-125.7L256 41.1zm-18.9 148l-98-34.9 66.8 96 31.2 49.3zm37.8 0v110.4l31.2-49.3 66.8-96-98 34.9z"/></svg>
                         d20 (Acierto)
@@ -210,7 +213,7 @@
 
         document.addEventListener('DOMContentLoaded', loadGamesList);
 
-        // --- Lógica de Juegos --- (Igual que antes)
+        // --- Lógica de Juegos ---
         async function loadGamesList() {
             const list = document.getElementById('games-list');
             try {
@@ -288,7 +291,6 @@
         }
 
         // --- NUEVA LÓGICA DE ANIMACIÓN DE DADOS ---
-        
         function toggleDiceMenu() {
             const dropdown = document.getElementById('dice-dropdown');
             const content = document.getElementById('dice-options');
@@ -324,49 +326,47 @@
 
         // Función principal que desencadena todo
         function triggerDiceRoll(sidesStr, svgHtml) {
-            // 1. Cerrar menú
             toggleDiceMenu();
-            
-            // 2. Calcular resultado
             const sides = parseInt(sidesStr);
             const roll = Math.floor(Math.random() * sides) + 1;
             
-            // 3. Mostrar Overlay y Preparar Animación
             const overlay = document.getElementById('dice-overlay');
             const container = document.getElementById('dice-anim-container');
             const resultElem = document.getElementById('dice-anim-result');
             
-            container.innerHTML = svgHtml; // Insertar SVG
+            container.innerHTML = svgHtml;
             resultElem.innerText = roll;
             resultElem.classList.remove('show');
             
-            // Resetear animación
             container.classList.remove('rolling');
-            void container.offsetWidth; // Trigger reflow
+            void container.offsetWidth; 
             
-            // Mostrar y Animar
             overlay.style.display = 'flex';
             container.classList.add('rolling');
             
-            // 4. Secuencia temporal
             setTimeout(() => {
-                // Mostrar número
                 resultElem.classList.add('show');
-            }, 1200); // Un poco antes de terminar la rotación
+            }, 1200); 
 
             setTimeout(() => {
-                // Cerrar y Enviar
                 overlay.style.display = 'none';
                 sendRollResult(sides, roll);
-            }, 2500); // Tiempo para ver el resultado
+            }, 2500); 
         }
 
-        // Envío automático tras la animación
+        // NO usamos esta función directamente desde el dropdown, sino triggerDiceRoll
+        function selectDice(value, iconHtml, text) {
+            // Lógica legacy para "Sin dado"
+            document.getElementById('dice-select').value = value;
+            const display = document.getElementById('selected-dice-display');
+            display.innerHTML = `<span>${iconHtml}</span> <span>${text}</span>`;
+            toggleDiceMenu();
+        }
+
         function sendRollResult(sides, roll) {
             const input = document.getElementById('user-action');
             let actionText = input.value.trim();
             
-            // Colores para el log
             let colorClass = '#a78bfa';
             if(sides === 20 && roll === 20) colorClass = '#10b981'; 
             if(sides === 20 && roll === 1) colorClass = '#ef4444'; 
@@ -375,9 +375,8 @@
             
             let displayAction = actionText ? `${actionText} ${diceTag}` : diceTag;
             
-            // Enviar
             performTurn(displayAction);
-            input.value = ''; // Limpiar input si había texto
+            input.value = '';
         }
 
         function parseSimpleMarkdown(text) {
@@ -392,13 +391,19 @@
         }
 
         async function startGame() {
+            // CORRECCIÓN: Aquí es donde fallaba antes. Ahora declaro todas las variables.
             const name = document.getElementById('char-name').value.trim() || "Aventurero Desconocido";
             const race = document.getElementById('char-race').value;
             const charClass = document.getElementById('char-class').value;
             const align = document.getElementById('char-align').value;
             const bg = document.getElementById('char-bg').value;
             const partySize = document.getElementById('party-size').value;
-            // CONSTRUIR PROMPT EXTENDIDO
+            const tone = document.getElementById('story-tone').value; // ¡Aquí está la variable tone!
+            const storyContext = document.getElementById('story-context').value.trim();
+
+            document.getElementById('hud-name').innerText = name;
+            document.getElementById('hud-details').innerText = `${race} ${charClass}`;
+            
             const elaboratePrompt = `
 Eres un Dungeon Master experto de Dungeons & Dragons 5e. Tu trabajo es narrar una aventura inmersiva y emocionante.
 
@@ -414,18 +419,13 @@ CONFIGURACIÓN:
 - Tono: ${tone}.
 - Objetivo: ${storyContext || "A elección del DM."}
 
-REGLAS DE DIRECCIÓN (IMPORTANTE):
-1. **Actúa como el DM**: describe el entorno, los NPCs y las consecuencias. NUNCA decidas las acciones, pensamientos ni diálogos del jugador.
-2. **GUÍA AL JUGADOR**: No termines con un simple "¿qué haces?". Al final de tu descripción, **sugiere siempre 2 o 3 opciones claras** de lo que podría hacer el personaje en esa situación (ej: "Podrías intentar forzar la puerta, buscar otra entrada por la ventana o escuchar si hay alguien dentro").
-3. **SOLICITA TIRADAS**: Cuando el jugador elija una acción con riesgo de fallo, o si la situación lo requiere (como percibir un peligro), **DETÉN la narración y pide explícitamente una tirada** (ej: "Haz una tirada de Sigilo" o "Tira Iniciativa"). No asumas el éxito sin ver el dado.
-4. **Interpreta los Dados**: Si el mensaje del jugador incluye una tirada (ej: [🎲 15]), usa ese número para determinar el éxito o fracaso comparándolo con una CD oculta.
-5. **Mecánicas D&D 5e**:
-   - Usa ventaja/desventaja si aplica.
-   - Gestiona inventario y salud narrativamente.
-   - En combate, usa turnos.
+REGLAS DE DIRECCIÓN:
+1. NUNCA decidas por el jugador.
+2. Solicita Tiradas explícitamente cuando haya riesgo.
+3. Interpreta resultados numéricos (ej: [🎲 15]).
+4. Gestiona inventario y salud narrativamente.
             `.trim();
 
-            // CORRECCIÓN: Usamos el ID específico del botón para evitar errores
             const btn = document.getElementById('btn-start-game');
             btn.innerText = "Invocando IAs...";
             btn.disabled = true;
@@ -440,8 +440,10 @@ REGLAS DE DIRECCIÓN (IMPORTANTE):
                 
                 if (data.gameId) {
                     currentGameId = data.gameId;
+                    
                     document.getElementById('setup-screen').style.display = 'none';
                     document.getElementById('game-screen').style.display = 'flex';
+                    
                     document.getElementById('log-1').innerHTML = '';
                     document.getElementById('log-2').innerHTML = '';
 
@@ -455,7 +457,6 @@ REGLAS DE DIRECCIÓN (IMPORTANTE):
             }
         }
 
-        // Función manual "ENVIAR" (sin dado)
         async function sendTurn() {
             const input = document.getElementById('user-action');
             let actionText = input.value.trim();
@@ -464,7 +465,6 @@ REGLAS DE DIRECCIÓN (IMPORTANTE):
             input.value = '';
         }
 
-        // Lógica central de envío al backend
         async function performTurn(displayText) {
             const btn = document.getElementById('btn-send');
             btn.disabled = true;
